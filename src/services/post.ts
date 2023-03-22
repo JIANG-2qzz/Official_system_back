@@ -7,6 +7,7 @@ import type {
 import { request } from '@umijs/max'
 
 export function postListRequest(params: IPostListParam) {
+  console.log(params, '发送请求')
   return request<IPostListResponse>('/post', {
     method: 'Get',
     params,

@@ -1,12 +1,8 @@
-import { Button, Form, Input, Modal, Upload } from 'antd'
-import type { UploadProps } from 'antd'
-import type { UploadFile } from 'antd/es/upload/interface'
-import React, { useState } from 'react'
+import { Button, Form, Input, Modal , Select } from 'antd'
+import React from 'react'
+import { updateIns } from '@/services/institution';
+import type { SelectProps } from 'antd';
 
-import { advUpdate } from '@/services/advertisement'
-import { getToken } from '@/utils/cookie'
-import { objBlank, reqName } from '@/utils/format'
-import { PlusOutlined } from '@ant-design/icons'
 
 export const UpdateForm = (props: any) => {
   const {
@@ -16,31 +12,12 @@ export const UpdateForm = (props: any) => {
     values,
     actionRef,
   } = props
-  console.log(values, 'values')
-  const name = reqName(values.phoUrl)
-  const newValues: any = objBlank(values)
-    ? {
-        uid: values.uid,
-        name,
-        status: 'done',
-      }
-    : {}
-  const [fileList, setFileList] = useState<UploadFile[]>([newValues])
-
-  const lists: UploadProps = {
-    name: 'file',
-    method: 'POST',
-    action: 'http://127.0.0.1:7498/upload/album',
-    headers: {
-      authorization: 'authorization-text',
-    },
-    onChange(info) {
-      setFileList([info.file])
-    },
-  }
-
+  // const [options,setOptions] = useState([...values.institutionNameDown])
+  console.log(props, "props")
+  const options: SelectProps['options'] = [];
   const onFinish = async (values: any) => {
-    await advUpdate(values)
+    console.log(values ,"提交数据")
+    await updateIns(values)
     handleUpdateModalVisible(false)
     if (actionRef.current) {
       actionRef.current.reload()
@@ -52,6 +29,10 @@ export const UpdateForm = (props: any) => {
       return result.data
     }
   }
+
+  const handleChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
   return (
     <Modal
       destroyOnClose
@@ -64,26 +45,25 @@ export const UpdateForm = (props: any) => {
       <Form
         onFinish={onFinish}
         initialValues={{
-          adHref: `${values.adHref}`,
-          putAdHref: `${values.putAdHref}`,
+          institutionName: `${values.institutionName}`,
+          institutionCode: `${values.institutionCode}`,
         }}
       >
-        <Form.Item label="图片上传" name="phoUrl" getValueFromEvent={normFile}>
-          <Upload
-            {...lists}
-            fileList={fileList}
-            listType="picture-card"
-            headers={{ authorization: getToken() || '' }}
-            maxCount={1}
-          >
-            <PlusOutlined />
-          </Upload>
-        </Form.Item>
-        <Form.Item label="广告链接" name="adHref">
+        <Form.Item label="机构类别" name="institutionName" getValueFromEvent={normFile}>
           <Input />
         </Form.Item>
-        <Form.Item label="发布链接" name="putAdHref">
+        <Form.Item label="机构Code" name="institutionCode">
           <Input />
+        </Form.Item>
+        <Form.Item label="部门" name="institutionNameDown">
+          <Select
+            mode="tags"
+            style={{ width: '100%' }}
+            placeholder="Tags Mode"
+            onChange={handleChange}
+            options={options}
+            defaultValue={values.institutionNameDown}
+          />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 10, span: 16 }}>
           <Button type="primary" htmlType="submit">

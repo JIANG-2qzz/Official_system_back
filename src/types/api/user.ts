@@ -19,7 +19,9 @@ export interface UserModel {
   avatar: string | Avatar
   introduce: string
   password?: string
-  create?: boolean
+  create?: boolean,
+  institutionNameDown: any,
+  institutionCode:string
 }
 
 interface Avatar {

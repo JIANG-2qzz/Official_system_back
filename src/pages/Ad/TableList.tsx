@@ -1,11 +1,7 @@
-import { Button, Divider, Upload, message } from 'antd'
-import type { UploadProps } from 'antd'
+import { Button, Divider, Space, Tag , Select } from 'antd'
 import type { UploadFile } from 'antd/es/upload/interface'
 import React, { useRef, useState } from 'react'
-
-import { advDelete, advFind } from '@/services/advertisement'
-import { getToken } from '@/utils/cookie'
-import { PlusOutlined } from '@ant-design/icons'
+import { insDelete , newInstitutionAll } from '@/services/institution' 
 import type { ActionType, ProColumns } from '@ant-design/pro-components'
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 
@@ -23,70 +19,43 @@ export const TableList: React.FC<unknown> = () => {
 
   const columns: ProColumns[] = [
     {
-      title: '图片上传',
-      hideInTable: true,
-      renderFormItem: () => {
-        const lists: UploadProps = {
-          name: 'file',
-          method: 'POST',
-          action: 'http://127.0.0.1:7498/upload/album',
-          onChange(info) {
-            setFileList([info.file])
-            if (info.file.response) {
-              setAdvUrl(info.file.response.data)
-            }
-          },
-          beforeUpload: async () => {
-            const result = await advFind()
-            if (result) {
-              message.error('已有广告，请点击对应列表修改')
-              return false
-            }
-            return true
-          },
-        }
+      title: '机构类别',
+      dataIndex: 'institutionName',
+    },
+    {
+      title: '机构Code',
+      dataIndex: 'institutionCode',
+    },
+    {
+      title: '部门',
+      dataIndex: 'institutionNameDown',
+      render: (_: any, record) => {
+        // console.log(_, record, "_, record)")
         return (
-          <Upload
-            {...lists}
-            fileList={fileList}
-            listType="picture-card"
-            headers={{ authorization: getToken() || '' }}
-            maxCount={1}
-          >
-            <PlusOutlined />
-          </Upload>
+          <Space size={[0, 8]} wrap>
+            {
+              _.map((e: any, index: any) => {
+                return <Tag key={index}>{e}</Tag>
+              })
+            }
+          </Space>
         )
       },
-    },
-    {
-      title: '图片地址',
-      dataIndex: 'phoUrl',
-      hideInForm: true,
-      render: (_: any) => (
-        <a href={_} target="_blank">
-          {_}
-        </a>
-      ),
-    },
-    {
-      title: '广告链接',
-      dataIndex: 'adHref',
-      valueType: 'text',
-      render: (_: any) => (
-        <a href={_} target="_blank">
-          {_}
-        </a>
-      ),
-    },
-    {
-      title: '发布链接',
-      dataIndex: 'putAdHref',
-      copyable: true,
-      ellipsis: true,
+      renderFormItem: (_: any, record) => {
+        return (
+          <Select
+            mode="tags"
+            style={{ width: '100%' }}
+            placeholder="Tags Mode"
+          // onChange={handleChange}
+          // options={options}
+          />
+        )
+      }
     },
     {
       title: '操作',
-      dataIndex: 'option',
+      // dataIndex: 'institutionCode',
       valueType: 'option',
       width: 100,
       render: (_, record) => (
@@ -102,7 +71,7 @@ export const TableList: React.FC<unknown> = () => {
           <Divider type="vertical" />
           <a
             onClick={async () => {
-              await advDelete(record._id)
+              await insDelete(record._id)
               if (actionRef.current) {
                 actionRef.current.reload()
               }
@@ -118,7 +87,7 @@ export const TableList: React.FC<unknown> = () => {
   return (
     <PageContainer
       header={{
-        title: '广告模块',
+        title: '机构模块',
       }}
     >
       <ProTable
@@ -135,16 +104,16 @@ export const TableList: React.FC<unknown> = () => {
           </Button>,
         ]}
         request={async () => {
-          const result = await advFind()
+          const result = await newInstitutionAll()
+          console.log(result, "result")
           if (!result) {
             return {
               data: [],
               success: true,
             }
           }
-          const arr = [result]
           return {
-            data: arr || [],
+            data: result.data || [],
             success: true,
           }
         }}

@@ -1,11 +1,11 @@
 import type { FormInstance } from 'antd'
-import { Form, Input, Modal, Tabs, Upload } from 'antd'
+import { Form, Input, Modal, Tabs , Cascader } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import type { FC } from 'react'
-import { useEffect } from 'react'
+import type { FC} from 'react';
+import { useState , useEffect } from 'react'
+
 import message from 'react-message-popup'
 
-import { UPLOAD_URL } from '@/services/upload'
 import {
   queryUserName,
   userCreateRequest,
@@ -13,9 +13,9 @@ import {
 } from '@/services/user'
 import type { UserModel } from '@/types/api/user'
 import { TEMP_PASSWORD } from '@/types/api/user'
-import { getToken, removeToken } from '@/utils/cookie'
-import { PlusOutlined } from '@ant-design/icons'
+import { removeToken } from '@/utils/cookie'
 import { history, useModel } from '@umijs/max'
+import { institutionAll } from '@/services/institution'
 
 interface UserModalProps {
   open: boolean
@@ -26,6 +26,10 @@ export const UserModal: FC<UserModalProps> = ({ open, setOpen }) => {
   const [form] = Form.useForm<UserModel>()
   const { initialState } = useModel('@@initialState')
   const obSubmit = async (user: UserModel) => {
+    console.log(user,"user")
+    user.institutionCode = user.institutionNameDown[0]
+    user.institutionNameDown = user.institutionNameDown[1]
+    
     let avatar = undefined
     if (typeof user.avatar !== 'string') {
       avatar = user?.avatar?.fileList[0]?.response?.data
@@ -100,8 +104,19 @@ interface UserFormProps {
   form: FormInstance<UserModel>
   create?: boolean
 }
+
+interface Option {
+  value: string | number;
+  label: string;
+  children?: Option[];
+}
 const UserForm: FC<UserFormProps> = ({ form, create }) => {
   const { initialState } = useModel('@@initialState')
+  const [options,setOptions] = useState()
+  async function demo (){
+    const result = await institutionAll()
+    setOptions(result)
+  }
 
   useEffect(() => {
     form.resetFields()
@@ -115,7 +130,11 @@ const UserForm: FC<UserFormProps> = ({ form, create }) => {
         create,
       })
     }
+    demo()
   }, [create])
+
+
+  
   return (
     <>
       <Form.Item
@@ -142,7 +161,14 @@ const UserForm: FC<UserFormProps> = ({ form, create }) => {
         <TextArea rows={4} />
       </Form.Item>
 
-      <Form.Item
+
+    <Form.Item
+      name="institutionNameDown"
+      label="机构"
+    >
+      <Cascader options={options}  />
+    </Form.Item>
+      {/* <Form.Item
         name="avatar"
         label="头像"
         rules={[{ required: true, message: '请上传头像' }]}
@@ -168,7 +194,7 @@ const UserForm: FC<UserFormProps> = ({ form, create }) => {
         >
           <PlusOutlined />
         </Upload>
-      </Form.Item>
+      </Form.Item> */}
     </>
   )
 }

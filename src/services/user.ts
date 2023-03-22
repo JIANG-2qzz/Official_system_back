@@ -38,3 +38,14 @@ export async function userUpdateRequest(user: UserModel) {
     data: user,
   })
 }
+
+export async function reqAllUser() {
+  return request(`/user/alluser`)
+}
+
+export async function newData(params:any,id:string) {
+  return request(`/user/newdata/${id}`, {
+    method: 'PUT',
+    data: params,
+  })
+}

@@ -6,4 +6,5 @@ export enum RoutePath {
   AD = '/ad',
   CONFIG = '/config',
   USER = '/user',
+  PERSON = '/PERSON'
 }

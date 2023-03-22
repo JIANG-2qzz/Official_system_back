@@ -1,5 +1,4 @@
 ﻿import { RoutePath } from './name'
-
 export default [
   {
     name: 'login',
@@ -9,12 +8,12 @@ export default [
   },
   {
     path: '/posts',
-    name: '文章',
+    name: '编写',
     icon: 'EditOutlined',
     routes: [
       {
         path: RoutePath.POSTS_VIEW,
-        name: '管理',
+        name: '管理1',
         component: './Posts/view',
       },
       {
@@ -33,7 +32,7 @@ export default [
   },
   {
     path: RoutePath.AD,
-    name: '广告',
+    name: '机构',
     access: 'canAdmin',
     icon: 'NotificationOutlined',
     component: './Ad',
@@ -44,6 +43,12 @@ export default [
     access: 'canAdmin',
     icon: 'ToolOutlined',
     component: './Config',
+  },
+  {
+    path: RoutePath.PERSON,
+    name: '人员',
+    access: 'canAdmin',
+    component: './Person',
   },
   {
     path: '/',

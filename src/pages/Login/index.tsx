@@ -12,7 +12,6 @@ import { history, useModel } from '@umijs/max'
 
 const Login: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState')
-
   const fetchUserInfo = async () => {
     const userInfo = await initialState?.fetchUserInfo?.()
     if (userInfo) {
@@ -29,6 +28,7 @@ const Login: React.FC = () => {
     const data = await login(values)
     setToken(data.token)
     await fetchUserInfo()
+    console.log(initialState, "initialState")
     message.success('登录成功')
     history.push(RoutePath.POSTS_VIEW)
   }

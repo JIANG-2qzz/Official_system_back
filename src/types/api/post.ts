@@ -15,6 +15,8 @@ export interface IPostListParam extends IPaginate {
   tag?: string
   sort?: Sort
   category?: string
+  permission: string,
+  institutionCode : string
 }
 
 export interface IPostListResponse {
@@ -36,6 +38,8 @@ export interface IPostList {
   content: string
   ad: boolean
   read: number
+  GWstatus: string,
+  institutionNameDown:string
 }
 
 export interface IPostModel extends IPostList {

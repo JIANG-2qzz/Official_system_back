@@ -1,8 +1,7 @@
 import { Modal } from 'antd'
 import type { PropsWithChildren } from 'react'
 import React from 'react'
-import type { AD } from '@/services/advertisement'
-import { advAdd } from '@/services/advertisement'
+import { addIns } from '@/services/institution' 
 import type { ProColumns } from '@ant-design/pro-components'
 import { ProTable } from '@ant-design/pro-components'
 
@@ -26,9 +25,9 @@ const CreateForm: React.FC<PropsWithChildren<CreateFormProps>> = (props) => {
       footer={null}
     >
       <ProTable
-        onSubmit={async (value: AD) => {
+        onSubmit={async (value:any) => {
           value.phoUrl = advUrl
-          const success = await advAdd(value)
+          const success = await addIns(value)
           console.log(success, 'submit')
           if (actionRef.current) {
             actionRef.current.reload()

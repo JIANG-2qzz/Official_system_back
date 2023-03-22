@@ -1,14 +1,13 @@
 import { Button, Popconfirm, Table, Tag } from 'antd'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
-import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import { message } from 'react-message-popup'
-
 import { ContentLayout } from '@/components/layouts/content'
 import { postDeleteRequest, postListRequest } from '@/services/post'
 import type { IPaginate, IPostList } from '@/types/api/post'
 import { relativeTimeFromNow } from '@/utils/time'
-import { Link, useNavigate } from '@umijs/max'
+import { Link, useNavigate, useModel } from '@umijs/max'
+import { statusFun } from '@/utils/status'
 
 const View = () => {
   const nav = useNavigate()
@@ -19,12 +18,19 @@ const View = () => {
   })
   const [totalCount, setTotalCount] = useState(0)
   const [loading, setLoading] = useState(false)
+  const { initialState, setInitialState } = useModel('@@initialState')
+ 
   const fetchData = async () => {
+    const userInfo:any = await initialState?.fetchUserInfo?.()
+    console.log(userInfo, "???????")
     setLoading(true)
     const list = await postListRequest({
       pageCurrent: page.pageCurrent,
       pageSize: page.pageSize,
+      permission: userInfo.permission,
+      institutionCode : userInfo.institutionCode
     })
+    console.log(list ," datalistlistlist")
     setTotalCount(list.totalCount)
     setData(list.postList)
     setLoading(false)
@@ -43,7 +49,7 @@ const View = () => {
 
   const columns: ColumnsType<IPostList> = [
     {
-      title: '标题',
+      title: '公文标题',
       dataIndex: 'title',
       width: 400,
       render: (text, { _id }) => (
@@ -57,48 +63,34 @@ const View = () => {
       render: (_, { category }) => <span>{category?.name || '暂无'}</span>,
     },
     {
-      title: '标签',
-      key: 'tags',
-      width: 200,
-      dataIndex: 'tags',
-      render: (_, { tags }) => (
-        <>
-          {tags.map((tag) => {
-            let color = tag.length > 5 ? 'geekblue' : 'green'
-            if (tag === 'loser') {
-              color = 'volcano'
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            )
-          })}
-        </>
-      ),
+      title: '发起者',
+      dataIndex: 'user',
+      width: 100,
+      render: (_, { user }) => <span>{user?.username || '暂无'}</span>,
     },
     {
-      title: '封面',
-      dataIndex: 'cover',
-      width: 100,
-      render: (_, { cover }) => {
-        if (!cover) {
-          return <span>暂无</span>
+      title: '标签',
+      key: 'GWstatus',
+      width: 200,
+      dataIndex: 'GWstatus',
+      render: (_, { GWstatus }) => {
+        console.log(GWstatus , "status")
+        return <>
+        {
+          <Tag color={statusFun(GWstatus)?.color}>
+          {statusFun(GWstatus)?.name}
+        </Tag>
         }
-        return (
-          <a href={cover} target="_blank">
-            点击查看
-          </a>
-        )
+      </>
       },
     },
     {
-      title: '广告',
-      dataIndex: 'ad',
+      title: '机构',
+      dataIndex: 'institutionNameDown',
       width: 80,
-      render: (_, { ad }) => (
-        <span className={clsx(ad && 'text-red-400')}>{ad ? '是' : '否'}</span>
-      ),
+      render: (_, { institutionNameDown }) => {
+        return <span>{institutionNameDown}</span>
+      },
     },
     {
       title: '阅读量',
